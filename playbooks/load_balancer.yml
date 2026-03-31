@@ -1,0 +1,11 @@
+---
+- name: Configure load balancer
+  hosts: load_balancer
+  become: true
+  vars_prompt:
+    - name: load_balancer_port
+      private: false
+      prompt: "Enter port number for load balancer"
+      default: "{{ load_balancer_port }}"
+  roles:
+    - load_balancer

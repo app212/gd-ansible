@@ -1,0 +1,16 @@
+server {
+    listen {{ web_server_port }};
+    server_name {{ web_server_server_name }};
+
+    root {{ web_server_root }};
+    index {{ web_server_index }};
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /health {
+        return 200 "OK";
+        add_header Content-Type text/plain;
+    }
+}
