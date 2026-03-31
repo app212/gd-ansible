@@ -3,9 +3,9 @@ global
 
 defaults
     mode http
-    timeout connect 5s
-    timeout client 30s
-    timeout server 30s
+    timeout connect {{ load_balancer_connect_timeout }}
+    timeout client {{ load_balancer_client_timeout }}
+    timeout server {{ load_balancer_server_timeout }}
 
 frontend http_front
     bind *:{{ load_balancer_port }}
@@ -14,5 +14,5 @@ frontend http_front
 backend web_back
     balance roundrobin
 {% for host in groups['web_servers'] %}
-    server {{ host }} {{ hostvars[host]['ansible_host'] }}:80 check
+    server {{ host }} {{ hostvars[host]['ansible_host'] }}:{{ web_server_port }} check
 {% endfor %}

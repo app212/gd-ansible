@@ -1,44 +1,9 @@
 ---
-- name: Install nginx
-  ansible.builtin.package:
-    name: nginx
-    state: present
+- name: Allow traffic on chosen ports
+  ansible.builtin.include_tasks: firewall.yml
 
-- name: Enable nginx
-  ansible.builtin.service:
-    name: nginx
-    state: started
-    enabled: true
+- name: Install and enable nginx
+  ansible.builtin.include_tasks: install.yml
 
-- name: Deploy site config
-  ansible.builtin.template:
-    src: nginx_site.conf.j2
-    dest: "{{ web_server_config_path }}"
-    owner: root
-    group: root
-    mode: "0644"
-  notify: Restart nginx
-
-- name: Deploy index.html
-  ansible.builtin.template:
-    src: index.html.j2
-    dest: "{{ web_server_root }}/{{ web_server_index }}"
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Allow traffic on port 80
-  ansible.posix.firewalld:
-    port: 80/tcp
-    zone: public
-    permanent: true
-    immediate: true
-    state: enabled
-
-- name: Allow traffic on port 443
-  ansible.posix.firewalld:
-    port: 443/tcp
-    zone: public
-    permanent: true
-    immediate: true
-    state: enabled
+- name: Deploy config and web page
+  ansible.builtin.include_tasks: deploy.yml

@@ -1,0 +1,20 @@
+- name: Allow traffic on port {{ web_server_port }}
+  ansible.posix.firewalld:
+    port: "{{ web_server_port }}/tcp"
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Allow traffic on port {{ web_server_ssl_port }}
+  ansible.posix.firewalld:
+    port: "{{ web_server_ssl_port }}/tcp"
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Make SELinux permissive
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive

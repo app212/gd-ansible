@@ -1,33 +1,9 @@
 ---
-- name: Install HAProxy
-  ansible.builtin.package:
-    name: haproxy
-    state: present
+- name: Allow traffic on chosen port
+  ansible.builtin.include_tasks: firewall.yml
 
-- name: Deploy HAProxy config
-  ansible.builtin.template:
-    src: haproxy.cfg.j2
-    dest: /etc/haproxy/haproxy.cfg
-    owner: root
-    group: root
-    mode: "0644"
-  notify: Restart HAProxy
+- name: Install and enable haproxy
+  ansible.builtin.include_tasks: install.yml
 
-- name: Allow traffic on port {{ load_balancer_port }}
-  ansible.posix.firewalld:
-    port: "{{ load_balancer_port }}/tcp"
-    zone: public
-    permanent: true
-    immediate: true
-    state: enabled
-
-- name: Make SELinux permissive
-  ansible.posix.selinux:
-    policy: targeted
-    state: permissive
-
-- name: Enable HAProxy
-  ansible.builtin.service:
-    name: haproxy
-    state: started
-    enabled: true
+- name: Deploy config
+  ansible.builtin.include_tasks: deploy.yml

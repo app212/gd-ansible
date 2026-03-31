@@ -1,0 +1,16 @@
+- name: Deploy site config
+  ansible.builtin.template:
+    src: nginx_site.conf.j2
+    dest: "{{ web_server_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nginx
+
+- name: Deploy index.html
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ web_server_root }}/{{ web_server_index }}"
+    owner: root
+    group: root
+    mode: "0644"

@@ -1,1 +1,7 @@
 env: prod
+web_server_port: 80
+web_server_ssl_port: 443
+load_balancer_port: 8082
+load_balancer_connect_timeout: 60s
+load_balancer_client_timeout: 120s
+load_balancer_server_timeout: 120s
