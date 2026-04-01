@@ -1,0 +1,39 @@
+- name: Check haproxy service status
+  ansible.builtin.service_facts:
+
+- name: Assert haproxy is running
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.services['haproxy.service'].state == 'running'
+    fail_msg: "HAProxy is not running on {{ inventory_hostname }}"
+    success_msg: "HAProxy is running on {{ inventory_hostname }}"
+
+- name: Send multiple requests through HAProxy
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}:{{ load_balancer_port }}"
+    return_content: true
+  register: lb_response
+  loop: "{{ range(0, groups['web_servers'] | length * 3) | list }}"
+  loop_control:
+    label: "request {{ item }}"
+
+- name: Collect all LB responses
+  ansible.builtin.set_fact:
+    lb_contents: "{{ lb_response.results | map(attribute='content') | join(' ') }}"
+
+- name: Assert all web servers responded
+  ansible.builtin.assert:
+    that:
+      - item in lb_contents
+    fail_msg: "Web server {{ item }} did not respond"
+    success_msg: "Web server {{ item }} responded"
+  loop: "{{ groups['web_servers'] }}"
+
+- name: Check listening ports
+  ansible.builtin.shell: ss -tupln
+  register: ports
+  changed_when: false
+
+- name: Print ports
+  ansible.builtin.debug:
+    var: ports.stdout_lines

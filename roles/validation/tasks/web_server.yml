@@ -1,0 +1,31 @@
+- name: Check nginx service status
+  ansible.builtin.service_facts:
+
+- name: Assert nginx is running
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.services['nginx.service'].state == 'running'
+    fail_msg: "Nginx is not running on {{ inventory_hostname }}"
+    success_msg: "Nginx is running on {{ inventory_hostname }}"
+
+- name: Check custom HTML page
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}:{{ web_server_port }}"
+    return_content: true
+  register: web_response
+
+- name: Validate page contains hostname and env
+  ansible.builtin.assert:
+    that:
+      - inventory_hostname in web_response.content and env in web_response.content
+    fail_msg: "Web page validation failed on {{ inventory_hostname }}"
+    success_msg: "Web page validated on {{ inventory_hostname }}"
+
+- name: Check listening ports
+  ansible.builtin.shell: ss -tupln
+  register: ports
+  changed_when: false
+
+- name: Print ports
+  ansible.builtin.debug:
+    var: ports.stdout_lines

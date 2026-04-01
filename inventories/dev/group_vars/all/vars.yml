@@ -1,5 +1,5 @@
 env: dev
-web_server_port: 8084
+web_server_port: 80
 web_server_ssl_port: 443
 load_balancer_port: 8085
 load_balancer_connect_timeout: 5s

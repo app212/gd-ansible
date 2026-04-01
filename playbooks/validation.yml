@@ -1,0 +1,12 @@
+---
+- name: Validate web servers
+  hosts: web_servers
+  gather_facts: false
+  roles:
+    - validation
+
+- name: Validate load balancer
+  hosts: load_balancer
+  gather_facts: false
+  roles:
+    - validation
